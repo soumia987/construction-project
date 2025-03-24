@@ -5,7 +5,7 @@ const taskSchema = new mongoose.Schema({
   description: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
- tasksNeeded: [{ type: String }],
+  tasksNeeded: [{ type: String }],
 });
 
 const Task = mongoose.model('Task', taskSchema);

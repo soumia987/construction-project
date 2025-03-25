@@ -5,7 +5,7 @@ const Footer = () => {
     <div>
        <div className="w-full  bg-gray-800 text-white">
       <div className="w-full">
-        <p className="py-5 text-sm text-center">
+        <p className="py-5 text-sm text-center overflow-hidden">
           Copyright 2025@ X-pert Construction.com - All Right Reserved.
         </p>
       </div>

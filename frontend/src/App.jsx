@@ -1,31 +1,30 @@
-import React from 'react'
-import Navbar from './components/Navbar';
+import React, { useState } from 'react';
 import Projects from './components/Projects';
 import Tasks from './components/Tasks';
-import Resources from './components/Resources';
-import Providers from './components/Providers';
-import Footer from './components/Footer';
+import Navbar from './components/Navbar';
 import About from './Pages/About';
-import './App.css'
+import Footer from './components/Footer';
+import axios from 'axios';
+
 
 function App() {
+  const [selectedProject, setSelectedProject] = useState(null);
 
   return (
-    <div> 
-      <main>
-
-    <Navbar/>
-    <About/>
-    <Projects/>
-    <Tasks/>
-    <Resources/>
-    <Providers/>
-    <Footer/>
-
-    </main>
-
+    <div className="min-h-screen bg-gray-100">
+      <Navbar/>
+      <About/>
+      {selectedProject ? (
+        <Tasks project={selectedProject} onBack={() => setSelectedProject(null)} />
+      ) : (
+        <Projects onProjectAdded={setSelectedProject} />
+       
+      )}
+        <Footer/>
+     
     </div>
-  )
+    
+  );
 }
 
-export default App
+export default App;

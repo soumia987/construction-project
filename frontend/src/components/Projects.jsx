@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-
-function Projects() {
+import axios from 'axios';
+function Projects({ onProjectAdded }) {
   const [projects, setProjects] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newProject, setNewProject] = useState({
+    id: '',
     name: '',
     description: '',
     startDate: '',
@@ -17,9 +18,15 @@ function Projects() {
 
   const handleAddProject = (e) => {
     e.preventDefault();
-    // In a real application, you would send this data to a backend API.
-    setProjects([...projects, newProject]);
+    const projectWithId = {
+      ...newProject,
+      id: Date.now().toString(), // Generate a unique ID
+    };
+    
+    setProjects([...projects, projectWithId]);
+    onProjectAdded(projectWithId); 
     setNewProject({
+      id: '',
       name: '',
       description: '',
       startDate: '',
@@ -27,6 +34,34 @@ function Projects() {
       budget: '',
     });
     setShowAddForm(false);
+    axios.post('http://localhost:5000/api/projects', newProject)
+    .then(response => {
+      console.log('Projet créé:', response.data);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la création du projet:', error);
+    });
+    axios.get('http://localhost:5000/api/projects')
+    .then(response => {
+      console.log('Liste des projets:', response.data);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des projets:', error);
+    });
+    axios.put(`http://localhost:5000/api/projects/${projectId}`, updatedProject)
+    .then(response => {
+      console.log('Projet mis à jour:', response.data);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la mise à jour du projet:', error);
+    });
+    axios.delete(`http://localhost:5000/api/projects/${projectId}`)
+    .then(response => {
+      console.log('Projet supprimé:', response.data);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la suppression du projet:', error);
+    });
   };
 
   return (
@@ -34,7 +69,7 @@ function Projects() {
       <h2 className="text-3xl font-semibold mb-6">Projects</h2>
       <button
         onClick={() => setShowAddForm(!showAddForm)}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4 hover:bg-blue-600 transition-colors"
+        className="px-4 py-2 bg-green-700 text-white rounded-md mb-4 hover:bg-green-400 transition-colors"
       >
         {showAddForm ? 'Cancel' : 'Add Project'}
       </button>
@@ -126,13 +161,19 @@ function Projects() {
       )}
 
       <ul className="mt-6 space-y-4">
-        {projects.map((project, index) => (
-          <li key={index} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
+        {projects.map((project) => (
+          <li key={project.id} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
             <h3 className="text-xl font-semibold">{project.name}</h3>
             <p className="text-sm text-gray-600">{project.description}</p>
             <p className="text-sm text-gray-500">Start Date: {project.startDate}</p>
             <p className="text-sm text-gray-500">End Date: {project.endDate}</p>
             <p className="text-sm text-gray-500">Budget: {project.budget}</p>
+            <button
+              onClick={() => onProjectAdded(project)}
+              className="mt-3 px-4 py-2 bg-green-700 text-white rounded-md mb-4 hover:bg-green-400 transition-colors"
+            >
+              Add Tasks
+            </button>
           </li>
         ))}
       </ul>

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
+import Resources from './Resources';
 
-function Tasks() {
+function Tasks({ project, onBack }) {
   const [tasks, setTasks] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [newTask, setNewTask] = useState({
+    id: '',
     description: '',
     startDate: '',
     endDate: '',
-    projectId: '',
-    resources: [],
+    taskNeeded: '',
   });
 
   const handleInputChange = (e) => {
@@ -17,42 +19,51 @@ function Tasks() {
 
   const handleAddTask = (e) => {
     e.preventDefault();
-    setTasks([...tasks, newTask]);
+    const taskWithId = {
+      ...newTask,
+      id: Date.now().toString(),
+      projectId: project.id,
+    };
+    setTasks([...tasks, taskWithId]);
+    setSelectedTask(taskWithId);
     setNewTask({
+      id: '',
       description: '',
       startDate: '',
       endDate: '',
-      projectId: '',
-      resources: [],
+      taskNeeded: '',
     });
     setShowAddForm(false);
   };
 
+  if (selectedTask) {
+    return <Resources taskId={selectedTask.id} onBack={() => setSelectedTask(null)} />;
+  }
+
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">Tasks</h2>
-      <button
-        onClick={() => setShowAddForm(!showAddForm)}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-      >
-        {showAddForm ? 'Cancel' : 'Add Task'}
-      </button>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <button
+            onClick={onBack}
+            className="text-blue-500 hover:text-blue-600 mb-2"
+          >
+            ← Back to Projects
+          </button>
+          <h2 className="text-2xl font-semibold">Tasks for {project.name}</h2>
+        </div>
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+        >
+          {showAddForm ? 'Cancel' : 'Add Task'}
+        </button>
+      </div>
 
       {showAddForm && (
         <div className="mt-4 p-6 border rounded-lg shadow-md bg-white">
           <h3 className="text-xl font-semibold mb-4">Add New Task</h3>
           <form onSubmit={handleAddTask}>
-          <div className="mb-4">
-              <label htmlFor="projectId" className="block text-sm font-medium text-gray-700">Project ID:</label>
-              <input
-                type="text"
-                id="projectId"
-                name="projectId"
-                value={newTask.projectId}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
             <div className="mb-4">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description:</label>
               <textarea
@@ -89,38 +100,45 @@ function Tasks() {
               />
             </div>
 
-            
             <div className="mb-4">
-              <label htmlFor="projectId" className="block text-sm font-medium text-gray-700">Task Needed:</label>
+              <label htmlFor="taskNeeded" className="block text-sm font-medium text-gray-700">Task Needed:</label>
               <input
                 type="text"
-                id="TaskNeeded"
-                name="Task Needed"
-                value={newTask.TaskNeeded}
+                id="taskNeeded"
+                name="taskNeeded"
+                value={newTask.taskNeeded}
                 onChange={handleInputChange}
                 className="w-full p-2 border border-gray-300 rounded-md"
               />
             </div>
 
-            {/* Add resource selection here (e.g., checkboxes, dropdown) */}
             <button
               type="submit"
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
             >
-              Add
+              Add Task
             </button>
           </form>
         </div>
       )}
 
       <ul className="mt-4 space-y-4">
-        {tasks.map((task, index) => (
-          <li key={index} className="p-4 border rounded-lg shadow-md bg-white">
-            <strong className="text-lg">{task.description}</strong>
-            <p className="text-sm text-gray-600">Start Date: {task.startDate}</p>
-            <p className="text-sm text-gray-600">End Date: {task.endDate}</p>
-            <p className="text-sm text-gray-600">Project ID: {task.projectId}</p>
-            {/* Display resources here */}
+        {tasks.map((task) => (
+          <li key={task.id} className="p-4 border rounded-lg shadow-md bg-white">
+            <div className="flex justify-between items-start">
+              <div>
+                <strong className="text-lg">{task.description}</strong>
+                <p className="text-sm text-gray-600">Start Date: {task.startDate}</p>
+                <p className="text-sm text-gray-600">End Date: {task.endDate}</p>
+                <p className="text-sm text-gray-600">Task Needed: {task.taskNeeded}</p>
+              </div>
+              <button
+                onClick={() => setSelectedTask(task)}
+                className=" bg-green-700 text-white rounded-md mb-4 hover:bg-green-400 transition"
+              >
+                Add Resources
+              </button>
+            </div>
           </li>
         ))}
       </ul>

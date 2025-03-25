@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Resources() {
+function Resources({ taskId, onBack }) {
   const [resources, setResources] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newResource, setNewResource] = useState({
@@ -8,6 +8,7 @@ function Resources() {
     type: '',
     quantity: '',
     supplierInfo: '',
+    taskId: taskId,
   });
 
   const handleInputChange = (e) => {
@@ -22,19 +23,30 @@ function Resources() {
       type: '',
       quantity: '',
       supplierInfo: '',
+      taskId: taskId,
     });
     setShowAddForm(false);
   };
 
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-4">Resources</h2>
-      <button
-        onClick={() => setShowAddForm(!showAddForm)}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-      >
-        {showAddForm ? 'Cancel' : 'Add Resource'}
-      </button>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <button
+            onClick={onBack}
+            className="text-blue-500 hover:text-blue-600 mb-2"
+          >
+            ← Back to Tasks
+          </button>
+          <h2 className="text-2xl font-semibold">Resources</h2>
+        </div>
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+        >
+          {showAddForm ? 'Cancel' : 'Add Resource'}
+        </button>
+      </div>
 
       {showAddForm && (
         <div className="mt-4 p-6 border rounded-lg shadow-md bg-white">

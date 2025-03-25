@@ -15,7 +15,7 @@ function Providers() {
 
   const handleAddProvider = (e) => {
     e.preventDefault();
-    // In a real application, you would send this data to a backend API.
+    
     setProviders([...providers, newProvider]);
     setNewProvider({
       name: '',

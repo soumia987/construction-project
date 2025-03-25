@@ -8,13 +8,13 @@ const Navbar = () => {
     <div className="container flex items-center justify-between">
   
       <div className="text-lg font-bold">
-        <a className="text-white hover:text-blue-300" href="#Home">Soumia Iradi</a>
+        <a className="text-white hover:text-red-900" href="#Home">Logo</a>
       </div>
 
       <ul className="flex space-x-8 ml-auto">
-        <li><a className="text-white hover:text-blue-300" href="#Home">Home</a></li>
-        <li><a className="text-white hover:text-blue-300" href="#About">About</a></li>
-        <li><a className="text-white hover:text-blue-300" href="#Projects">Projects</a></li>
+        <li><a className="text-white hover:text-red-900" href="#Home">Home</a></li>
+        <li><a className="text-white hover:text-red-900" href="#About">About</a></li>
+        <li><a className="text-white hover:text-red-900" href="#Projects">Projects</a></li>
       </ul>
     </div>
   </nav>

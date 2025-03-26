@@ -3,8 +3,8 @@ const Resource = require('../models/Ressource');
 // Ajouter une ressource
 exports.addResource = async (req, res) => {
   try {
-    const { type, quantity, fournisseur } = req.body;
-    const newResource = new Resource({  type:type, quantity:quantity, fournisseur:fournisseur });
+    const { type, quantity, supplier } = req.body;
+    const newResource = new Resource({  type:type, quantity:quantity, supplier:supplier });
     await newResource.save();
     res.status(201).json(newResource);
   } catch (error) {

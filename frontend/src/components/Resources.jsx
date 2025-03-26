@@ -1,30 +1,23 @@
 import React, { useState } from 'react';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 function Resources({ taskId, onBack }) {
   const [resources, setResources] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newResource, setNewResource] = useState({
-    name: '',
-    type: '',
-    quantity: '',
-    supplierInfo: '',
-    taskId: taskId,
+
+  // Yup validation schema
+  const validationSchema = Yup.object({
+    name: Yup.string().required('Name is required'),
+    type: Yup.string().required('Type is required'),
+    quantity: Yup.number().required('Quantity is required').positive('Quantity must be a positive number'),
+    supplierInfo: Yup.string().required('Supplier info is required'),
   });
 
-  const handleInputChange = (e) => {
-    setNewResource({ ...newResource, [e.target.name]: e.target.value });
-  };
-
-  const handleAddResource = (e) => {
-    e.preventDefault();
+  const handleAddResource = (values, { resetForm }) => {
+    const newResource = { ...values, taskId };
     setResources([...resources, newResource]);
-    setNewResource({
-      name: '',
-      type: '',
-      quantity: '',
-      supplierInfo: '',
-      taskId: taskId,
-    });
+    resetForm(); // Reset the form after successful submission
     setShowAddForm(false);
   };
 
@@ -51,63 +44,72 @@ function Resources({ taskId, onBack }) {
       {showAddForm && (
         <div className="mt-4 p-6 border rounded-lg shadow-md bg-white">
           <h3 className="text-xl font-semibold mb-4">Add New Resource</h3>
-          <form onSubmit={handleAddResource}>
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name:</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={newResource.name}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+          <Formik
+            initialValues={{
+              name: '',
+              type: '',
+              quantity: '',
+              supplierInfo: '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleAddResource}
+          >
+            {({ isSubmitting }) => (
+              <Form>
+                <div className="mb-4">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name:</label>
+                  <Field
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <div className="mb-4">
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700">Type:</label>
-              <input
-                type="text"
-                id="type"
-                name="type"
-                value={newResource.type}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700">Type:</label>
+                  <Field
+                    type="text"
+                    id="type"
+                    name="type"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="type" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <div className="mb-4">
-              <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantity:</label>
-              <input
-                type="text"
-                id="quantity"
-                name="quantity"
-                value={newResource.quantity}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantity:</label>
+                  <Field
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="quantity" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <div className="mb-4">
-              <label htmlFor="supplierInfo" className="block text-sm font-medium text-gray-700">Supplier Info:</label>
-              <input
-                type="text"
-                id="supplierInfo"
-                name="supplierInfo"
-                value={newResource.supplierInfo}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="supplierInfo" className="block text-sm font-medium text-gray-700">Supplier Info:</label>
+                  <Field
+                    type="text"
+                    id="supplierInfo"
+                    name="supplierInfo"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="supplierInfo" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-            >
-              Add
-            </button>
-          </form>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                >
+                  {isSubmitting ? 'Adding...' : 'Add'}
+                </button>
+              </Form>
+            )}
+          </Formik>
         </div>
       )}
 

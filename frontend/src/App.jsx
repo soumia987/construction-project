@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import Projects from './components/Projects';
 import Tasks from './components/Tasks';
 import Navbar from './components/Navbar';
-import About from './Pages/About';
 import Footer from './components/Footer';
-import axios from 'axios';
-
+import Hero from './components/Hero';
+import Resource from './components/Resources';
 
 function App() {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -13,13 +12,19 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar/>
-      <About/>
+      <Hero/>
+      {/* <Projects/>
+      <Tasks/>
+      <Resource/> */}
+   
+      
       {selectedProject ? (
         <Tasks project={selectedProject} onBack={() => setSelectedProject(null)} />
       ) : (
         <Projects onProjectAdded={setSelectedProject} />
        
       )}
+
         <Footer/>
      
     </div>

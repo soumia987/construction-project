@@ -1,39 +1,50 @@
 import React, { useState } from 'react';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import Resources from './Resources';
+import axios from 'axios';
 
 function Tasks({ project, onBack }) {
   const [tasks, setTasks] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [newTask, setNewTask] = useState({
-    id: '',
-    description: '',
-    startDate: '',
-    endDate: '',
-    taskNeeded: '',
+
+  const validationSchema = Yup.object({
+    description: Yup.string()
+      .required('Description is required')
+      .min(5, 'Description must be at least 5 characters'),
+    startDate: Yup.date()
+      .required('Start date is required')
+      .nullable(),
+    endDate: Yup.date()
+      .required('End date is required')
+      .min(Yup.ref('startDate'), 'End date cannot be before start date')
+      .nullable(),
+    taskNeeded: Yup.string()
+      .required('Task Needed is required')
+      .min(3, 'Task Needed must be at least 3 characters'),
   });
 
-  const handleInputChange = (e) => {
-    setNewTask({ ...newTask, [e.target.name]: e.target.value });
-  };
-
-  const handleAddTask = (e) => {
-    e.preventDefault();
+  const handleAddTask = (values, { setSubmitting, resetForm }) => {
     const taskWithId = {
-      ...newTask,
+      ...values,
       id: Date.now().toString(),
       projectId: project.id,
     };
+
     setTasks([...tasks, taskWithId]);
     setSelectedTask(taskWithId);
-    setNewTask({
-      id: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      taskNeeded: '',
-    });
+    resetForm();
     setShowAddForm(false);
+
+    // API call to create task
+    axios.post('http://localhost:5000/api/tasks', taskWithId)
+      .then(response => {
+        console.log('Task created:', response.data);
+      })
+      .catch(error => {
+        console.error('Error creating task:', error);
+      });
   };
 
   if (selectedTask) {
@@ -63,62 +74,72 @@ function Tasks({ project, onBack }) {
       {showAddForm && (
         <div className="mt-4 p-6 border rounded-lg shadow-md bg-white">
           <h3 className="text-xl font-semibold mb-4">Add New Task</h3>
-          <form onSubmit={handleAddTask}>
-            <div className="mb-4">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description:</label>
-              <textarea
-                id="description"
-                name="description"
-                value={newTask.description}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+          <Formik
+            initialValues={{
+              description: '',
+              startDate: '',
+              endDate: '',
+              taskNeeded: '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleAddTask}
+          >
+            {({ isSubmitting }) => (
+              <Form>
+                <div className="mb-4">
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description:</label>
+                  <Field
+                    as="textarea"
+                    id="description"
+                    name="description"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="description" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <div className="mb-4">
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date:</label>
-              <input
-                type="date"
-                id="startDate"
-                name="startDate"
-                value={newTask.startDate}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date:</label>
+                  <Field
+                    type="date"
+                    id="startDate"
+                    name="startDate"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="startDate" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <div className="mb-4">
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date:</label>
-              <input
-                type="date"
-                id="endDate"
-                name="endDate"
-                value={newTask.endDate}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date:</label>
+                  <Field
+                    type="date"
+                    id="endDate"
+                    name="endDate"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="endDate" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <div className="mb-4">
-              <label htmlFor="taskNeeded" className="block text-sm font-medium text-gray-700">Task Needed:</label>
-              <input
-                type="text"
-                id="taskNeeded"
-                name="taskNeeded"
-                value={newTask.taskNeeded}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="taskNeeded" className="block text-sm font-medium text-gray-700">Task Needed:</label>
+                  <Field
+                    type="text"
+                    id="taskNeeded"
+                    name="taskNeeded"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <ErrorMessage name="taskNeeded" component="div" className="text-red-500 text-sm" />
+                </div>
 
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-            >
-              Add Task
-            </button>
-          </form>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                >
+                  {isSubmitting ? 'Adding Task...' : 'Add Task'}
+                </button>
+              </Form>
+            )}
+          </Formik>
         </div>
       )}
 
@@ -134,7 +155,7 @@ function Tasks({ project, onBack }) {
               </div>
               <button
                 onClick={() => setSelectedTask(task)}
-                className=" bg-green-700 text-white rounded-md mb-4 hover:bg-green-400 transition"
+                className="bg-green-700 text-white rounded-md mb-4 hover:bg-green-400 transition"
               >
                 Add Resources
               </button>
